@@ -12,6 +12,11 @@ void Executer::execute(const std::vector<std::string> &tokens)
     if (Builtins::handle(tokens))
         return;
 
+    bool background = false;
+
+    if (!tokens.empty() && tokens.back() == "&")
+    background = true; 
+
     int redirectIndex = -1;
 
    
@@ -27,8 +32,10 @@ void Executer::execute(const std::vector<std::string> &tokens)
     std::vector<const char *> argv;
 
     int limit = tokens.size();
+    if (background)
+     limit--;
     if (redirectIndex != -1)
-        limit = redirectIndex;
+     limit = redirectIndex;
 
  
     for (int i = 0; i < limit; i++)
@@ -73,6 +80,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
 
-    else // parent process
-        waitpid(pid, nullptr, 0);
+    else{ // parent process
+        if (!background)
+	   waitpid(pid, nullptr, 0);
+    }
 }
